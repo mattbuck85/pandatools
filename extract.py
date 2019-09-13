@@ -18,7 +18,11 @@ def workaround(filename, header=0, sep=',', encoding='utf-8'):
         """ Drop the row indexes which overflow into the null columns
         """
         ncols = pd.Series(df.columns.isna())
-        bad_rows = df[df.iloc[:,ncols[ncols == True].index[0]].notna()]
+        bad_rows = df[
+            df.iloc[ 
+                :, ncols[ncols == True].index[0] #first null column index
+            ].notna()
+        ]
         print(
             "Discovered problematic rows, dropping",
             *bad_rows.index
