@@ -5,7 +5,7 @@
 import extract
 extract.encoding('./file.txt')
 
->>> utf-8
+>>> "utf-8"
 ```
 
 ### Problematic CSV Extraction
