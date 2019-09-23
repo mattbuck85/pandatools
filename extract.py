@@ -1,10 +1,12 @@
 import pandas as pd
 import numpy as np
 import csv
+import operator as op
 from encodings.aliases import aliases
 from itertools import chain
 from contextlib import contextmanager
 
+CODECS = set(aliases.values())
 
 def workaround(filename, header=0, sep=',', encoding='utf-8'):
     """ Extractor function which performs a dumb split and 
@@ -35,8 +37,15 @@ def workaround(filename, header=0, sep=',', encoding='utf-8'):
     return df.loc[header+1:, df.columns.notna()]
 
 def encoding(filename):
-    codecs = (encoding for alias, encoding in aliases.items())
-    for codec in chain(('utf-8', 'latin-1'), codecs):
+    """ Tries to open file from a sequence of codecs and returns the first
+        detected codec. If a file is ASCII it will open in utf-8 and latin-1,
+        but if a file is latin-1 it will fail in utf-8.  Used as an 
+        alternative to codec sniffing in chardet https://chardet.readthedocs.io/
+        Rationale:  You want to open the file for writing and want to use the best
+        supported charset.
+        TODO: Determine proper codec try order.
+    """
+    for codec in chain(('utf-8', 'latin-1'), CODECS):
         try:
             with open(filename, 'r', encoding=codec):
                 return codec
