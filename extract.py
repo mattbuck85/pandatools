@@ -6,6 +6,7 @@ from encodings.aliases import aliases
 from itertools import chain
 from contextlib import contextmanager
 
+
 CODECS = set(aliases.values())
 
 def workaround(filename, header=0, sep=',', encoding='utf-8'):
@@ -20,7 +21,7 @@ def workaround(filename, header=0, sep=',', encoding='utf-8'):
             line.strip().split(sep) for line in fh.readlines()
         )
     df.columns = df.loc[header]
-    if any(df.columns.isna()):
+    if df.columns.isna().any():
         """ Drop the row indexes which overflow into the null columns
         """
         ncols = pd.Series(df.columns.isna())
@@ -35,6 +36,7 @@ def workaround(filename, header=0, sep=',', encoding='utf-8'):
         )
         df = df.drop(bad_rows.index).reset_index(drop=True)
     return df.loc[header+1:, df.columns.notna()]
+
 
 def encoding(filename):
     """ Tries to open file from a sequence of codecs and returns the first
@@ -53,10 +55,12 @@ def encoding(filename):
             pass
     raise Exception('Unknown exception, all codecs fail')
 
+    
 @contextmanager
 def test(function: str):
     yield print(function + ' Test')
 
+    
 if __name__ == '__main__':
     with test('Workaround Extraction'):
         print('Control Test')
